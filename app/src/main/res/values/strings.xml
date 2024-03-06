@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Dodo pizza</string>
+    <string name="add_to_cart">Add to Cart</string>
+    <string name="pizza_pic">Double Chicken</string>
+    <string name="Enter_pizza_name">Enter pizza name</string>
+    <string name="pizzas">3 Pizzas</string>
+</resources>

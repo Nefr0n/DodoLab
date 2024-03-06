@@ -1,0 +1,81 @@
+package com.example.dodopizza
+import androidx.recyclerview.widget.ListAdapter
+import com.example.dodopizza.databinding.ItemNewPizzaBinding
+import com.example.dodopizza.databinding.ItemPizzaBinding
+import com.example.dodopizza.model.Pizza
+import java.lang.IllegalArgumentException
+import android.view.LayoutInflater
+import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
+import android.annotation.SuppressLint
+
+class PizzaAdapter: ListAdapter<Pizza, BasePizzaViewHolder<*>>(PizzasDiffUtil()) {
+    var itemClick: ((Pizza) -> Unit)? = null
+    class PizzasDiffUtil:DiffUtil.ItemCallback<Pizza>(){
+        override fun areContentsTheSame(oldItem: Pizza, newItem: Pizza): Boolean {
+            return oldItem.title == newItem.title
+        }
+
+        override fun areItemsTheSame(oldItem: Pizza, newItem: Pizza): Boolean {
+            return oldItem == newItem
+        }
+    }
+    companion object {
+        private const val VIEW_TYPE_PIZZA = 1
+        private const val VIEW_TYPE_COMBO = 2
+    }
+
+    override fun getItemViewType(position: Int): Int {
+        return when (getItem(position).type){
+            "pizza" -> VIEW_TYPE_PIZZA
+            "combo" -> VIEW_TYPE_COMBO
+            else -> throw IllegalArgumentException("Invalid")
+        }
+    }
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BasePizzaViewHolder<*> {
+        return when(viewType){
+            VIEW_TYPE_PIZZA -> PizzaViewHolder(
+                ItemPizzaBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+            )
+            VIEW_TYPE_COMBO -> PizzaComboViewHolder(
+                ItemNewPizzaBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+            )
+            else -> throw IllegalArgumentException("Invalid")
+        }
+    }
+
+    inner class PizzaComboViewHolder(binding: ItemNewPizzaBinding):
+        BasePizzaViewHolder<ItemNewPizzaBinding>(binding){
+        @SuppressLint("SetTextI18n")
+        override fun bindView(item: Pizza) {
+            with(binding){
+                title.text = item.title
+                content.text = item.desc
+                img.setImageResource(item.img)
+                price.text = item.price.toString()+" KZT"
+            }
+        }
+    }
+    override fun onBindViewHolder(holder: BasePizzaViewHolder<*>, position: Int) {
+        holder.bindView(getItem(position))
+    }
+    inner class PizzaViewHolder(binding:ItemPizzaBinding):
+        BasePizzaViewHolder<ItemPizzaBinding>(binding){
+        @SuppressLint("SetTextI18n")
+        override fun bindView(item: Pizza) {
+            with(binding){
+                title.text = item.title
+                desc.text = item.desc
+                price.text = item.price.toString()+" KZT"
+                pic.setImageResource(item.img)
+            }
+            itemView.setOnClickListener {
+                itemClick?.invoke(item)
+            }
+        }
+    }
+
+
+
+
+}
